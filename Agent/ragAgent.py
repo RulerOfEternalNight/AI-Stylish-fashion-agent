@@ -87,7 +87,7 @@ def recommend_products(user_query: str, matches):
     Here are some products from our catalog that might be relevant:
     {context}
 
-    Please recommend the best products in a friendly, engaging way.
+    Please recommend the best products in a friendly, engaging way. Also score each of the products according to the relevance to the user given senario/context.
     """
 
     if EMBEDDING_PROVIDER == 'GEMINI':

@@ -32,8 +32,7 @@ An intelligent fashion recommendation system that enhances the Google Online Bou
 ```
 AI-Stylish-fashion-agent/
 ├── Agent/                    # AI Agent implementations
-│   ├── ragv2.py             # RAG system v2 - basic, prototype version
-│   └── ragv3.py             # RAG system v3 with enhanced features - final version
+│   └── ragAgent.py             # RAG system - final version
 ├── DBfile/                   # Database and gRPC components
 │   ├── db.py                # Main database operations and gRPC client
 │   ├── demo_pb2.py          # Protocol buffer definitions
