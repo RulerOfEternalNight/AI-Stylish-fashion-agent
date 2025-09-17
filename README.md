@@ -92,6 +92,7 @@ AI-Stylish-fashion-agent/
    
    # Pull the embedding model
    ollama pull nomic-embed-text
+   ollama pull llama3.2:latest 
    ```
 
    **Option B: Gemini (Cloud)**
