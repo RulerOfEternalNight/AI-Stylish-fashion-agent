@@ -5,6 +5,10 @@ import google.generativeai as genai
 from pinecone import Pinecone, ServerlessSpec
 import ollama
 import os
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 # --- 1. Get User Input for Embedding Provider ---
 def get_provider_choice():
