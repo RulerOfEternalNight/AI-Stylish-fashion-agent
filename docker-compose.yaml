@@ -9,9 +9,7 @@ services:
       - .env
 
   frontend:
-    build:
-      context: .                # root is build context
-      dockerfile: Frontend/Dockerfile
+    build: ./Frontend     # 👈 build context points to Frontend folder
     ports:
       - "8501:8501"
     depends_on:
