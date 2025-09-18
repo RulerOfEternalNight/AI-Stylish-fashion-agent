@@ -16,17 +16,28 @@ An intelligent fashion recommendation system that enhances the Google Online Bou
 ## Architecture
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │   AI Agent      │    │   Database      │
-│                 │<──>│   (RAG System)  │<──>│   (Pinecone)    │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                                                       │
-                                                       v
-                                              ┌─────────────────┐
-                                              │   gRPC Service  │
-                                              │   (Product API) │
-                                              └─────────────────┘
+┌───────────────────┐      ┌────────────────────────┐      ┌───────────────────┐
+│   Frontend (UI)   │      │   AI Agent Service     │      │   Vector Database  │
+│   Streamlit :8501 │<────>│   FastAPI (RAG System) │<────>│   Pinecone Index   │
+└───────────────────┘      └────────────────────────┘      └───────────────────┘
+                                                               │
+                                                               v
+                                                     ┌───────────────────┐
+                                                     │  gRPC Product API │
+                                                     │ (Online Boutique) │
+                                                     └───────────────────┘
+
 ```
+
+## Screenshots
+
+![Frontend Search Query](pics/pic1.png)
+
+### RAG Agent Service Flow
+![Query connected to RAG Service Flow](pics/pic2.png)
+
+### End-to-End System
+![Result](pics/pic3.png)
 
 ## Project Structure
 
@@ -107,7 +118,6 @@ AI-Stylish-fashion-agent/
 
 6. **Run with Docker Compose**
    ```bash
-   # Install Ollama
    docker-compose up --build
    ```
   - Frontend → http://localhost:8501
