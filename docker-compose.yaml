@@ -1,0 +1,16 @@
+services:
+  ragagent:
+    build:
+      context: .                # root is build context
+      dockerfile: Agent/Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+
+  frontend:
+    build: ./Frontend     # 👈 build context points to Frontend folder
+    ports:
+      - "8501:8501"
+    depends_on:
+      - ragagent

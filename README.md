@@ -10,36 +10,54 @@ An intelligent fashion recommendation system that enhances the Google Online Bou
 - **Vector Search**: Leverages Pinecone for efficient semantic product search
 - **gRPC Integration**: Seamlessly connects with the existing Google Online Boutique microservices
 - **Modern Web Interface**: Beautiful Streamlit-based frontend (Temp for MVP) for easy interaction
+- **Dockerized Microservices**: Independent containers for ragagent (backend) and frontend.
 
 
 ## Architecture
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │   AI Agent      │    │   Database      │
-│                 │<──>│   (RAG System)  │<──>│   (Pinecone)    │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                                                       │
-                                                       v
-                                              ┌─────────────────┐
-                                              │   gRPC Service  │
-                                              │   (Product API) │
-                                              └─────────────────┘
+┌───────────────────┐      ┌────────────────────────┐      ┌───────────────────┐
+│   Frontend (UI)   │      │   AI Agent Service     │      │   Vector Database  │
+│   Streamlit :8501 │<────>│   FastAPI (RAG System) │<────>│   Pinecone Index   │
+└───────────────────┘      └────────────────────────┘      └───────────────────┘
+                                                               │
+                                                               v
+                                                     ┌───────────────────┐
+                                                     │  gRPC Product API │
+                                                     │ (Online Boutique) │
+                                                     └───────────────────┘
+
 ```
+
+## Screenshots
+
+![Frontend Search Query](pics/pic1.png)
+
+### RAG Agent Service Flow
+![Query connected to RAG Service Flow](pics/pic2.png)
+
+### End-to-End System
+![Result](pics/pic3.png)
 
 ## Project Structure
 
 ```
 AI-Stylish-fashion-agent/
-├── Agent/                    # AI Agent implementations
-│   └── ragAgent.py             # RAG system - final version
-├── DBfile/                   # Database and gRPC components
-│   ├── db.py                # Main database operations and gRPC client
-│   ├── demo_pb2.py          # Protocol buffer definitions
-│   └── demo_pb2_grpc.py     # gRPC service stubs
-├── Frontend/                 # Web interface
-│   └── app.py               # Streamlit web application
-└── README.md                # This file
+├── Agent/                   # AI Agent (FastAPI microservice)
+│   ├── ragAgent_service.py   # RAG system - API server
+│   └── Dockerfile           # Container setup for agent
+├── DBfile/                  # Database + gRPC components
+│   ├── db.py
+│   ├── demo_pb2.py
+│   └── demo_pb2_grpc.py
+├── Frontend/                # Web interface (Streamlit)
+│   ├── app.py
+│   └── Dockerfile
+├── requirements.txt         # Shared dependencies
+├── docker-compose.yaml      # Compose setup (Frontend + Agent)
+├── .env_template            # Environment variable template
+└── README.md                # Documentation
+
 ```
 
 ## Quick Start
@@ -47,7 +65,7 @@ AI-Stylish-fashion-agent/
 ### Prerequisites
 
 - Python 3.10+
-- Docker (for running Google Online Boutique)
+- Docker & Docker compose
 - Pinecone account
 - Ollama (for local embeddings) OR Google AI API key (for cloud embeddings)
 
@@ -98,6 +116,12 @@ AI-Stylish-fashion-agent/
    - Get your API key from [Google AI Studio](https://aistudio.google.com/)
    - Add it to your `.env` file
 
+6. **Run with Docker Compose**
+   ```bash
+   docker-compose up --build
+   ```
+  - Frontend → http://localhost:8501
+  - Backend (RAG Agent) → http://localhost:8000/docs
 <!-- 
 ### Running the Application
 

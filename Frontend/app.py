@@ -1,4 +1,9 @@
 import streamlit as st
+import requests
+
+# Use service name in docker-compose, fallback to localhost if running locally
+API_URL = "http://ragagent:8000/search"   # for Docker Compose
+# API_URL = "http://localhost:8000/search"  # uncomment for local testing without Docker
 
 st.set_page_config(page_title="AI Stylist", page_icon="👗", layout="wide")
 
@@ -14,10 +19,38 @@ style_query = st.text_input(
     placeholder="Type your dream outfit here..."
 )
 
-# Find button (placeholder action)
+# Button
 if st.button("🔍 Find My Style"):
     if style_query:
-        st.info("🚧 Stylist Agent coming soon... Stay tuned! 🚀")
+        with st.spinner("Stylist Agent is thinking... 👩‍🎨"):
+            try:
+                # ✅ Use API_URL here
+                response = requests.post(
+                    API_URL,
+                    json={"query": style_query},
+                    timeout=20
+                )
+                response.raise_for_status()
+                result = response.json()
+                recommendation = result["recommendation"]
+                products = result["products"]
+
+                st.success("✨ Here's what we found!")
+                st.markdown(recommendation)
+
+                for item in products:
+                    st.markdown(
+                        f"""
+                        <div style='border:1px solid #ddd; padding:15px; border-radius:10px; margin:10px 0; background-color:#fff0f5;'>
+                            <strong>{item['name']}</strong> — 💲{item['price_units']}<br>
+                            <span style='color:gray'>{item['description']}</span>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+            except requests.exceptions.RequestException as e:
+                st.error(f"❌ Failed to contact AI Stylist Agent. Error: {e}")
     else:
         st.warning("Please enter a style to search 👆")
 
