@@ -1,0 +1,12 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'us-central1-docker.pkg.dev/gket10-aistyleagent/gket10/agent:latest', '-f', 'Agent/Dockerfile', '.']
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'us-central1-docker.pkg.dev/gket10-aistyleagent/gket10/frontend:latest', '-f', 'Frontend/Dockerfile', '.']
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'us-central1-docker.pkg.dev/gket10-aistyleagent/gket10/agent:latest']
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'us-central1-docker.pkg.dev/gket10-aistyleagent/gket10/frontend:latest']

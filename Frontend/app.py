@@ -1,9 +1,14 @@
 import streamlit as st
 import requests
+import os
 
-# Use service name in docker-compose, fallback to localhost if running locally
-API_URL = "http://ragagent:8000/search"   # for Docker Compose
-# API_URL = "http://localhost:8000/search"  # uncomment for local testing without Docker
+# --- API URL Selection ---
+# Priority:
+# 1. If API_URL is set in env → use it
+# 2. Otherwise, fallback to localhost
+
+# API_URL = "http://ragagent:8000/search"   # for Docker Compose
+API_URL = os.getenv("API_URL", "http://localhost:8000/search")
 
 st.set_page_config(page_title="AI Stylist", page_icon="👗", layout="wide")
 
@@ -24,7 +29,6 @@ if st.button("🔍 Find My Style"):
     if style_query:
         with st.spinner("Stylist Agent is thinking... 👩‍🎨"):
             try:
-                # ✅ Use API_URL here
                 response = requests.post(
                     API_URL,
                     json={"query": style_query},

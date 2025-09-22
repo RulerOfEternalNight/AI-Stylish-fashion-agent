@@ -1,17 +1,20 @@
+# ragAgent_service.py
 import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from pydantic import BaseModel
 import google.generativeai as genai
+import ollama
 from pinecone import Pinecone
 
 load_dotenv()
 
-# ---- Embedding provider: GEMINI ----
-EMBEDDING_PROVIDER = 'GEMINI'
+OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "http://localhost:11434")
+
+# Auto-detect embedding provider (fallback to GEMINI)
+EMBEDDING_PROVIDER = os.getenv('EMBEDDING_PROVIDER', 'GEMINI').upper()
 print(f"🔧 Using embedding provider: {EMBEDDING_PROVIDER}")
 
-# Pinecone setup
 PINECONE_API_KEY = os.getenv('PINECONE_API_KEY')
 PINECONE_ENVIRONMENT = os.getenv('PINECONE_ENVIRONMENT')
 INDEX_NAME = 'online-boutique-products'
@@ -19,19 +22,29 @@ INDEX_NAME = 'online-boutique-products'
 pc = Pinecone(api_key=PINECONE_API_KEY, environment=PINECONE_ENVIRONMENT)
 index = pc.Index(INDEX_NAME)
 
-# ---- Gemini embedding function ----
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
-if not GEMINI_API_KEY:
-    raise ValueError("GEMINI_API_KEY is missing in environment variables")
-genai.configure(api_key=GEMINI_API_KEY)
-embedding_model = 'models/embedding-001'
+# ---- Embedding function ----
+if EMBEDDING_PROVIDER == 'GEMINI':
+    GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+    genai.configure(api_key=GEMINI_API_KEY)
+    embedding_model = 'gemini-embedding-001'
 
-def get_embedding(text: str):
-    return genai.embed_content(
-        model=embedding_model,
-        content=text,
-        task_type="RETRIEVAL_QUERY"
-    )["embedding"]
+    def get_embedding(text: str):
+        return genai.embed_content(
+            model=embedding_model,
+            content=text,
+            task_type="RETRIEVAL_QUERY"
+        )["embedding"]
+
+elif EMBEDDING_PROVIDER == 'OLLAMA':
+    def get_embedding(text: str):
+        response = ollama.embeddings(
+            model="nomic-embed-text",
+            prompt=text,
+            host=OLLAMA_API_URL
+        )
+        return response["embedding"]
+else:
+    raise ValueError("Unknown embedding provider")
 
 # ---- RAG Logic ----
 def retrieve_products(user_query: str, top_k: int = 5):
@@ -73,6 +86,20 @@ def recommend_products(user_query: str, matches):
     model = genai.GenerativeModel("gemini-2.0-flash")
     response = model.generate_content(prompt)
     recommendation_text = response.text
+
+    # if EMBEDDING_PROVIDER == 'GEMINI':
+    #     model = genai.GenerativeModel("gemini-1.5-flash")
+    #     response = model.generate_content(prompt)
+    #     recommendation_text = response.text
+    # else:
+    #     response = ollama.chat(
+    #         model="llama3.2:latest",
+    #         messages=[
+    #             {"role": "system", "content": "You are a helpful shopping assistant."},
+    #             {"role": "user", "content": prompt}
+    #         ]
+    #     )
+    #     recommendation_text = response["message"]["content"]
 
     return recommendation_text, db_results
 

@@ -85,3 +85,7 @@ pinecone_data/
 # Uncomment if you regenerate protobuf files
 # *.pb2.py
 # *.pb2_grpc.py
+
+# JD Personal
+JD_temp
+PTInst.txt
